@@ -1,0 +1,19 @@
+{
+  "title": "TamaleJS",
+  "name": "tamale",
+  "version": "0.0.1",
+  "homepage": "blastingconcept.com",
+  "author": {
+    "name": "Mark Bryles",
+    "email": "mbryles@gmail.com"
+  },
+  "licenses": [
+    {
+      "type": "GPLv2",
+      "url": "http://www.example.org/licenses/gpl.html"
+    }
+  ],
+  "devDependencies": {
+    "grunt-contrib-clean": "~0.3.2"
+  }
+}

@@ -1,0 +1,579 @@
+<!doctype html>
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
+  <script src="../src/tamale.js"></script>
+
+  <script>
+  $(document).ready(function(){
+
+	module("SimpleStore Tests");
+
+	var simple_store = Tamale.create('Tamale.SimpleStore');
+	
+	test("create simple store", function () {
+		//simple_store = Tamale.create('Tamale.SimpleStore');
+		ok(Object.prototype.toString(simple_store) === '[object Object]', "simple store is an object");
+		ok(simple_store.get_name() === 'Tamale.SimpleStore', "object name is Tamale.SimpleStore");
+	})
+
+	test("add a string to simple store", function() {
+		simple_store.put("fooKey", "foo");
+	  	ok( typeof simple_store.get("fooKey") === 'string', "added string" );
+	});
+	
+	test("add another string to simple store", function() {
+		simple_store.put("barKey", "foodaddy");
+	  	ok( typeof simple_store.get("fooKey") === 'string', "added string" );
+	});
+	
+	test("add another string value to the simple store whose key already exists", function () {
+		try {
+			simple_store.put("fooKey", "anotherfoo");
+		} catch (e) {
+			ok(Object.prototype.toString.call(e) === '[object Error]', e);
+		}
+	});
+	
+	test("add boolean to simple store", function () {
+		simple_store.put("isFoo", true);
+		ok(typeof simple_store.get("isFoo") === 'boolean', "added boolean");
+	});
+	
+	test("add number to simple store", function () {
+		simple_store.put("age", 45);
+		ok(typeof simple_store.get("age") === 'number', "added number");
+	});
+	
+	test("add date to simple store", function () {
+		var today = new Date();
+		simple_store.put("today", today);
+		ok(Object.prototype.toString.call(simple_store.get("today")) === '[object Date]', "added date");
+	});
+	
+	test("add array to simple store", function () {
+		var arr = ['one', 2, '3'];
+		simple_store.put("mixedArray", arr);
+		ok(Object.prototype.toString.apply(simple_store.get("mixedArray")) === '[object Array]', "added array");
+	});
+	
+	test("add object to simple store", function () {
+		var obj = {
+			foo: "bar",
+			num: 23,
+			say:  function (argument) {
+				return "hello " + argument;
+			}
+		};
+		
+		simple_store.put("pojo", obj);
+		ok(Object.prototype.toString.apply(simple_store.get("pojo")) === '[object Object]', "added object");
+	})
+	
+	test("remove item from simple_store", function () {
+		simple_store.put("red", "ball");
+		simple_store.remove("red");
+		ok(typeof simple_store.get("red") === "undefined", "removed item 'red' from simple store");
+	})
+	
+	test("dump store contents as json string", function () {
+		var str = simple_store.dump_json();
+		ok(typeof simple_store.dump_json(), "dump as json ok: " + simple_store.dump_json());
+	});
+	
+	test("get size of simple store", function () {
+		var simple_store_length = Tamale.create('Tamale.SimpleStore');
+		simple_store_length.put("foo", "bar");
+		simple_store_length.put("bar", "baz");
+		simple_store_length.put("truthy", true);
+		var size = simple_store_length.len();
+		ok(size === 3, "size of simple store is " + size );
+	});
+	
+	test("clear store contents", function () {
+		var simple_store_clear = Tamale.create('Tamale.SimpleStore');
+		simple_store_clear.put("foo", "bar");
+		simple_store_clear.put("bar", "baz");
+		simple_store_clear.put("truthy", true);
+		
+		simple_store_clear.clear();
+		ok(simple_store_clear.len() === 0, "simple store is empty");
+	});
+	
+	module("Model tests");
+	
+	test("create model", function () {
+		var model = Tamale.create('Tamale.Model',
+		{
+			fields: [
+				{
+					name: "firstName",
+					type: "string"
+				},
+				{
+					name: "lastName",
+					type: "string"
+				},
+				{
+					name: "dob",
+					type: "date"
+				},
+				{
+					name: "age",
+					type: "number"
+				},
+				{
+					name: "isAdmin",
+					type: "boolean"
+				}	
+			],
+			id : true
+		});
+		ok(model.get_name() === "Tamale.Model", "model object created");
+	});
+	
+	test("create invalid model", function () {
+		var mfields = [
+				{
+					name: "firstName",
+					type: "foostring"
+				},
+				{
+					name: "lastName",
+					type: "string"
+				}	
+			];
+		try {
+			var model = Tamale.create('Tamale.Model',{ fields: mfields });
+			ok(false, "")
+		} catch(e) {
+			ok(true,e);
+		}
+		
+	});
+  });
+  
+  module("DataStore tests");
+  
+  test("create model and datastore with generated id", function () {
+        var data_fields = [
+				{
+					name: "firstName",
+					type: "string"
+				},
+				{
+					name: "lastName",
+					type: "string"
+				},
+				{
+					name: "dob",
+					type: "date"
+				},
+				{
+					name: "age",
+					type: "number"
+				},
+				{
+					name: "isAdmin",
+					type: "boolean"
+				}	
+			];
+        var data_model = Tamale.create("Tamale.Model", { fields : data_fields } );
+		var data_store = Tamale.create("Tamale.DataStore", {
+			model: data_model,
+			id: true
+		});
+		ok(data_store != 'undefined' && data_store.get_name() === "Tamale.DataStore", "datastore created");
+		
+		var rec = {
+			firstName: "Mark",
+			lastName: "Bryles",
+			dob: new Date("03/01/1970"),
+			age: 42,
+			isAdmin: true
+		};
+		
+		var i = data_store.put(rec);
+
+		ok(true, JSON.stringify(data_store.get(0)));
+		ok(data_store.len() === 1, "added record to data_store with index of "  + i + ": " + data_store.dump_json());
+		
+		var rec01 = {
+			firstName : "Gern",
+			lastName : "Blandsten",
+			dob: new Date("01/01/1970"),
+			age: 42,
+			isAdmin: false
+		};
+		
+		i = data_store.put(rec01);
+		
+		ok(data_store.len() === 2, "added another record to data_store with index of " + i + ": " + data_store.dump_json());
+		
+		var rec02 = {
+			firstName : "Navin",
+			lastName : "Johnson",
+			dob: new Date("05/16/1960"),
+			age: 52,
+			isAdmin: false
+		};
+		
+		i = data_store.put(rec02);
+		
+		ok(data_store.len() === 3, "added another record to data_store with index of " + i + ": " + data_store.dump_json());
+  });
+  
+  test("create model and datastore without generated id", function () {
+        var data_fields = [
+				{
+					name: "firstName",
+					type: "string"
+				},
+				{
+					name: "lastName",
+					type: "string"
+				},
+				{
+					name: "dob",
+					type: "date"
+				},
+				{
+					name: "age",
+					type: "number"
+				},
+				{
+					name: "isAdmin",
+					type: "boolean"
+				}	
+			];
+        var data_model = Tamale.create("Tamale.Model", { fields : data_fields } );
+		var data_store = Tamale.create("Tamale.DataStore", {
+			model: data_model,
+			id: false
+		});
+		ok(data_store != 'undefined' && data_store.get_name() === "Tamale.DataStore", "datastore created");
+		
+		var rec = {
+			firstName: "Mark",
+			lastName: "Bryles",
+			dob: new Date("03/01/1970"),
+			age: 42,
+			isAdmin: true
+		};
+		
+		var i = data_store.put("mark",rec);
+
+		ok(data_store.len() === 1, "added record to data_store: " + data_store.dump_json());
+		
+		var rec01 = {
+			firstName : "Gern",
+			lastName : "Blandsten",
+			dob: new Date("01/01/1970"),
+			age: 42,
+			isAdmin: false
+		};
+		
+		i = data_store.put("gern",rec01);
+		
+		ok(data_store.len() === 2, "added another record to data_store: " + data_store.dump_json());
+		
+		var rec02 = {
+			firstName : "Navin",
+			lastName : "Johnson",
+			dob: new Date("05/16/1960"),
+			age: 52,
+			isAdmin: false
+		};
+		
+		i = data_store.put("navin",rec02);
+		
+		ok(data_store.len() === 3, "added another record to data_store: " + data_store.dump_json());
+  });
+  
+   module("DataStore sort tests");
+   
+   test("create model, datastore with generated id and add data ", function () {
+         var data_fields = [
+ 				{
+ 					name: "firstName",
+ 					type: "string"
+ 				},
+ 				{
+ 					name: "lastName",
+ 					type: "string"
+ 				},
+ 				{
+ 					name: "dob",
+ 					type: "date"
+ 				},
+ 				{
+ 					name: "age",
+ 					type: "number"
+ 				},
+ 				{
+ 					name: "isAdmin",
+ 					type: "boolean"
+ 				}	
+ 			];
+        
+		var data_model = Tamale.create("Tamale.Model", { fields : data_fields } );
+ 		var data_store = Tamale.create("Tamale.DataStore", {
+ 			model: data_model,
+ 			id: true
+ 		});
+ 		
+ 		var rec = {
+ 			firstName: "Mark",
+ 			lastName: "Bryles",
+ 			dob: new Date("03/01/1970"),
+ 			age: 42,
+ 			isAdmin: true
+ 		};
+		
+ 		var i = data_store.put(rec);
+
+ 		
+ 		var rec01 = {
+ 			firstName : "Gern",
+ 			lastName : "Blandsten",
+ 			dob: new Date("01/01/1970"),
+ 			age: 42,
+ 			isAdmin: false
+ 		};
+		
+ 		i = data_store.put(rec01);
+		
+ 		
+ 		var rec02 = {
+ 			firstName : "Navin",
+ 			lastName : "Johnson",
+ 			dob: new Date("05/16/1960"),
+ 			age: 52,
+ 			isAdmin: false
+ 		};
+		
+		i = data_store.put(rec02);
+ 		var rec03 = {
+ 			firstName : "Navin",
+ 			lastName : "Johnson",
+ 			dob: new Date("05/16/1961"),
+ 			age: 62,
+ 			isAdmin: false
+ 		};
+		
+ 		i = data_store.put(rec03);
+		
+		console.log(data_store.dump_json());
+		
+		//data_store.sort("firstName","age");
+		data_store.sort({ field : "firstName", order : "DESC" },"age");
+		
+ 	    ok(true, "sort data by 'firstName', descending, and age: " + data_store.dump_json());
+		
+		data_store.sort({ field : "lastName", order : "ASC" });
+		
+ 	    ok(true, "sort data by 'lastName', ascending: " + data_store.dump_json());
+		
+		data_store.sort({ field : "dob", order : "ASC" });
+		
+ 	    ok(true, "sort data by 'dob', ascending: " + data_store.dump_json());
+   });
+   
+    module("DataStore local storage tests");
+	
+	test("create model, datastore and add to local storage", function () {
+        var data_fields = [
+				{
+					name: "firstName",
+					type: "string"
+				},
+				{
+					name: "lastName",
+					type: "string"
+				},
+				{
+					name: "dob",
+					type: "date"
+				},
+				{
+					name: "age",
+					type: "number"
+				},
+				{
+					name: "isAdmin",
+					type: "boolean"
+				}	
+			];
+        var data_model = Tamale.create("Tamale.Model", { fields : data_fields } );
+		var data_store_local = Tamale.create("Tamale.DataStore", {
+			model: data_model,
+			id: false,
+			storeType: "local"
+		});
+		
+		var valid = false;
+		var valid_text = "";
+		
+		if (data_store_local !== 'undefined' && data_store_local.get_name() === "Tamale.DataStore") {
+			valid = true;
+			valid_text ="datastore data_store_local created" ;
+		}
+		//ok(data_store_local != 'undefined' && data_store_local.get_name() === "Tamale.DataStore", "datastore data_store_local created");
+		//notEqual('undefined', 'undefined', 'data_store_local created not undefined');
+		//ok(valid,valid_text);
+		
+		if(data_store_local != 'undefined' && data_store_local.get_name() === "Tamale.DataStore") {
+			ok(true, "datastore data_store_local created");
+		}
+		
+		
+		var rec = {
+			firstName: "Mark",
+			lastName: "Bryles",
+			dob: new Date("03/01/1970"),
+			age: 42,
+			isAdmin: true
+		};
+		
+		var i = data_store_local.put("mark",rec);
+		
+		valid = false;
+		valid_text = "";
+		if (data_store_local.len() === 1) {
+			valid = true;
+			valid_text = "added record to data_store_local: " + data_store_local.dump_json();
+			ok(true, valid_text);
+		}
+
+		var rec01 = {
+			firstName : "Gern",
+			lastName : "Blandsten",
+			dob: new Date("01/01/1970"),
+			age: 42,
+			isAdmin: false
+		};
+		
+		i = data_store_local.put("gern",rec01);
+		
+		if(data_store_local.len() === 2) {
+			ok(true, "added another record to data_store_local");
+		}
+		
+		
+		var rec02 = {
+			firstName : "Navin",
+			lastName : "Johnson",
+			dob: new Date("05/16/1960"),
+			age: 52,
+			isAdmin: false
+		};
+		
+		i = data_store_local.put("navin",rec02);
+		
+		if (data_store_local.len() === 3) {
+			valid_text =  "added another record to data_store_local: " + data_store_local.dump_json();
+			ok(true,valid_text);
+		}
+		//ok(true);
+		if (data_store_local.clear()) {
+			ok(true, "data_store_local cleared");
+		}
+		
+	});
+	
+	test("create model, datastore and add to local storage with generated id", function () {
+        var data_fields = [
+				{
+					name: "firstName",
+					type: "string"
+				},
+				{
+					name: "lastName",
+					type: "string"
+				},
+				{
+					name: "dob",
+					type: "date"
+				},
+				{
+					name: "age",
+					type: "number"
+				},
+				{
+					name: "isAdmin",
+					type: "boolean"
+				}	
+			];
+        var data_model = Tamale.create("Tamale.Model", { fields : data_fields } );
+		var another_data_store_local = Tamale.create("Tamale.DataStore", {
+			model: data_model,
+			id: true,
+			storeType: "local"
+		});
+		
+		if (another_data_store_local != 'undefined' && another_data_store_local.get_name() === "Tamale.DataStore") {
+			ok(true,"datastore another_data_store_local created");
+		}
+		
+		var rec = {
+			firstName: "Mark",
+			lastName: "Bryles",
+			dob: new Date("03/01/1970"),
+			age: 42,
+			isAdmin: true
+		};
+		
+		var i = another_data_store_local.put(rec);
+
+		if (another_data_store_local.len() === 1) {
+			ok(true, "added record to another_data_store_local: " + another_data_store_local.dump_json());
+		}
+		
+		var rec01 = {
+			firstName : "Gern",
+			lastName : "Blandsten",
+			dob: new Date("01/01/1970"),
+			age: 42,
+			isAdmin: false
+		};
+		
+		i = another_data_store_local.put(rec01);
+		
+		if (another_data_store_local.len() === 2) {
+			ok(true, "added another record to another_data_store_local: " + another_data_store_local.dump_json());
+		}
+		
+		var rec02 = {
+			firstName : "Navin",
+			lastName : "Johnson",
+			dob: new Date("05/16/1960"),
+			age: 52,
+			isAdmin: false
+		};
+		
+		i = another_data_store_local.put(rec02);
+		
+		if (another_data_store_local.len() === 3) {
+			ok(true, "added another record to another_data_store_local: " + another_data_store_local.dump_json());
+		}
+		
+		if (another_data_store_local.clear()) {
+			ok(true, "another_data_store_local cleared");
+		}
+		
+	});
+
+  </script>
+  
+</head>
+<body>
+  <h1 id="qunit-header">TamaleJS Tests</h1>
+ <h2 id="qunit-banner"></h2>
+ <div id="qunit-testrunner-toolbar"></div>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+ <div id="qunit-fixture">test markup, will be hidden</div>
+</body>
+</html>

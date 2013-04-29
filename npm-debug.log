@@ -1,0 +1,50 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/mbryles/.nvm/v0.10.0/bin/node',
+1 verbose cli   '/Users/mbryles/.nvm/v0.10.0/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'grunt' ]
+2 info using npm@1.2.14
+3 info using node@v0.10.0
+4 verbose read json /Users/mbryles/Documents/Development/blastingconcept/tamale/package.json
+5 warn package.json tamale@0.0.1 No README.md file found!
+6 verbose read json /Users/mbryles/Documents/Development/blastingconcept/tamale/node_modules/grunt-contrib-clean/package.json
+7 verbose from cache /Users/mbryles/Documents/Development/blastingconcept/tamale/package.json
+8 verbose readDependencies using package.json deps
+9 verbose cache add [ 'grunt', null ]
+10 verbose cache add name=undefined spec="grunt" args=["grunt",null]
+11 verbose parsed url { protocol: null,
+11 verbose parsed url   slashes: null,
+11 verbose parsed url   auth: null,
+11 verbose parsed url   host: null,
+11 verbose parsed url   port: null,
+11 verbose parsed url   hostname: null,
+11 verbose parsed url   hash: null,
+11 verbose parsed url   search: null,
+11 verbose parsed url   query: null,
+11 verbose parsed url   pathname: 'grunt',
+11 verbose parsed url   path: 'grunt',
+11 verbose parsed url   href: 'grunt' }
+12 silly lockFile 20ff3fd8-grunt grunt
+13 verbose lock grunt /Users/mbryles/.npm/20ff3fd8-grunt.lock
+14 silly lockFile 20ff3fd8-grunt grunt
+15 verbose addNamed [ 'grunt', '' ]
+16 verbose addNamed [ null, '' ]
+17 silly lockFile 55f1ff24-grunt grunt@
+18 verbose lock grunt@ /Users/mbryles/.npm/55f1ff24-grunt.lock
+19 silly lockFile 55f1ff24-grunt grunt@
+20 error Error: EACCES, open '/Users/mbryles/.npm/55f1ff24-grunt.lock'
+20 error  { [Error: EACCES, open '/Users/mbryles/.npm/55f1ff24-grunt.lock']
+20 error   errno: 3,
+20 error   code: 'EACCES',
+20 error   path: '/Users/mbryles/.npm/55f1ff24-grunt.lock' }
+21 error Please try running this command again as root/Administrator.
+22 error System Darwin 12.3.0
+23 error command "/Users/mbryles/.nvm/v0.10.0/bin/node" "/Users/mbryles/.nvm/v0.10.0/bin/npm" "install" "grunt"
+24 error cwd /Users/mbryles/Documents/Development/blastingconcept/tamale
+25 error node -v v0.10.0
+26 error npm -v 1.2.14
+27 error path /Users/mbryles/.npm/55f1ff24-grunt.lock
+28 error code EACCES
+29 error errno 3
+30 error stack Error: EACCES, open '/Users/mbryles/.npm/55f1ff24-grunt.lock'
+31 verbose exit [ 3, true ]
